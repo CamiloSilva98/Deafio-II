@@ -1,24 +1,39 @@
 #ifndef SURTIDOR_H
 #define SURTIDOR_H
 
-#include "tanque.h"
 #include <string>
+#include <ctime>
+using namespace std;
+
+struct Transaccion {
+    time_t fecha;
+    string categoria;
+    double cantidad;
+    string metodoPago;
+    int numeroDocumentoCliente;
+    double montoTotal;
+};
 
 class Surtidor {
 private:
     int codigo;
-    std::string modelo;
-    static const int MAX_TRANSACCIONES = 100; // Definimos un máximo de transacciones
-    std::string historialTransacciones[MAX_TRANSACCIONES];
+    string modelo;
+    bool activo;
+    static const int MAX_TRANSACCIONES = 100;
+    Transaccion transacciones[MAX_TRANSACCIONES];
     int numTransacciones;
-    float ventasTotales;
 
 public:
-    Surtidor(int codigo, std::string modelo);
-    void venderCombustible(float cantidad, const std::string& categoria, const std::string& metodoPago, const std::string& docCliente, Tanque& tanque);
-    void mostrarHistorial() const;
-    float getVentasTotales() const;
-    int getCodigo() const;
+    Surtidor(int codigo, const string& modelo);
+
+    void registrarVenta(const string& categoria, double cantidad, const string& metodoPago,
+                        int numeroDocumentoCliente, double montoTotal);
+    void mostrarTransacciones() const;
+    double obtenerLitrosVendidos(const string& categoria) const;
+    double obtenerVentaTotal(const string& categoria) const;
+    void cambiarEstado();
+    bool estaActivo() const;
+    int obtenerCodigo() const;
 };
 
 #endif // SURTIDOR_H
