@@ -5,7 +5,8 @@ using namespace std;
 
 Tanque::Tanque() : capacidadRegular(0), capacidadPremium(0), capacidadEcoExtra(0),
     cantidadRegular(0), cantidadPremium(0), cantidadEcoExtra(0),
-    precioRegular(0), precioPremium(0), precioEcoExtra(0) {}
+    precioRegular(0), precioPremium(0), precioEcoExtra(0), totalVendidoRegular(0), 
+    totalVendidoPremium(0), totalVendidoEcoExtra(0){}
 
 void Tanque::asignarCapacidades() {
     capacidadRegular = 100 + (rand() % 101); // Entre 100 y 200 litros
@@ -22,13 +23,20 @@ void Tanque::asignarCapacidades() {
     cout << "EcoExtra: " << capacidadEcoExtra << " litros\n";
 }
 
-void Tanque::restarCantidad(const std::string& categoria, double cantidad) {
-    if (categoria == "Regular") {
+void Tanque::restarCantidad(const std::string& categoria, double cantidad)
+{
+    if (categoria == "Regular")
+    {
         cantidadRegular -= cantidad;
-    } else if (categoria == "Premium") {
+        totalVendidoRegular += cantidad;
+    } else if (categoria == "Premium")
+    {
         cantidadPremium -= cantidad;
-    } else if (categoria == "EcoExtra") {
+        totalVendidoPremium += cantidad;
+    } else if (categoria == "EcoExtra")
+    {
         cantidadEcoExtra -= cantidad;
+        totalVendidoEcoExtra += cantidad;
     }
 }
 
@@ -54,25 +62,34 @@ double Tanque::obtenerPrecio(const std::string& categoria) const {
     return 0;
 }
 
-void Tanque::fijarPrecios(double regular, double premium, double ecoExtra) {
+void Tanque::fijarPrecios(double regular, double premium, double ecoExtra) 
+{
     precioRegular = regular;
     precioPremium = premium;
     precioEcoExtra = ecoExtra;
 }
 
-void Tanque::verificarFugas() const {
-    double porcentajeRegular = (cantidadRegular / capacidadRegular) * 100;
-    double porcentajePremium = (cantidadPremium / capacidadPremium) * 100; // cambiar la manera en que se verifica la fuga
-    double porcentajeEcoExtra = (cantidadEcoExtra / capacidadEcoExtra) * 100;
+void Tanque::verificarFugas() const 
+{
+    double totalRegular = cantidadRegular + totalVendidoRegular;
+    double totalPremium = cantidadPremium + totalVendidoPremium;
+    double totalEcoExtra = cantidadEcoExtra + totalVendidoEcoExtra;
+    
+    double porcentajeRegular = (totalRegular / capacidadRegular) * 100;
+    double porcentajePremium = (totalPremium / capacidadPremium) * 100;
+    double porcentajeEcoExtra = (totalEcoExtra / capacidadEcoExtra) * 100;
 
     cout << "Verificación de fugas:\n";
-    cout << "Regular: " << porcentajeRegular << "% disponible\n";
-    cout << "Premium: " << porcentajePremium << "% disponible\n";
-    cout << "EcoExtra: " << porcentajeEcoExtra << "% disponible\n";
+    cout << "Regular: " << porcentajeRegular << "% del total (vendido + en tanque)\n";
+    cout << "Premium: " << porcentajePremium << "% del total (vendido + en tanque)\n";
+    cout << "EcoExtra: " << porcentajeEcoExtra << "% del total (vendido + en tanque)\n";
 
-    if (porcentajeRegular < 95 || porcentajePremium < 95 || porcentajeEcoExtra < 95) {
+    if (porcentajeRegular < 95 || porcentajePremium < 95 || porcentajeEcoExtra < 95) 
+    {
         cout << "¡Alerta! Posible fuga detectada en uno o más tanques.\n";
-    } else {
+    } 
+    else 
+    {
         cout << "No se detectaron fugas. Todos los tanques están por encima del 95% de su capacidad.\n";
     }
 }
