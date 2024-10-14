@@ -4,17 +4,11 @@
 #include <string>
 using namespace std;
 
-class Tanque {
+class Tanque
+{
 private:
-    double capacidadRegular;
-    double capacidadPremium;
-    double capacidadEcoExtra;
-    double cantidadRegular;
-    double cantidadPremium;
-    double cantidadEcoExtra;
-    double precioRegular;
-    double precioPremium;
-    double precioEcoExtra;
+    double capacidadRegular, capacidadPremium, capacidadEcoExtra, cantidadRegular, cantidadPremium, cantidadEcoExtra,
+precioRegular, precioPremium, precioEcoExtra, totalVendidoRegular, totalVendidoPremium, totalVendidoEcoExtra;
 
 public:
     Tanque();
