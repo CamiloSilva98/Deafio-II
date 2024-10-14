@@ -3,10 +3,10 @@
 #include <iomanip>
 using namespace std;
 
-Surtidor::Surtidor(int codigo, const std::string& modelo)
+Surtidor::Surtidor(int codigo, const string& modelo)
     : codigo(codigo), modelo(modelo), activo(true), numTransacciones(0) {}
 
-void Surtidor::registrarVenta(const std::string& categoria, double cantidad, const std::string& metodoPago,
+void Surtidor::registrarVenta(const string& categoria, double cantidad, const string& metodoPago,
                               int numeroDocumentoCliente, double montoTotal) {
     if (numTransacciones < MAX_TRANSACCIONES) {
         Transaccion nuevaTransaccion;
@@ -68,3 +68,4 @@ bool Surtidor::estaActivo() const {
 int Surtidor::obtenerCodigo() const {
     return codigo;
 }
+
