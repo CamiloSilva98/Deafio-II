@@ -62,7 +62,7 @@ void Tanque::fijarPrecios(double regular, double premium, double ecoExtra) {
 
 void Tanque::verificarFugas() const {
     double porcentajeRegular = (cantidadRegular / capacidadRegular) * 100;
-    double porcentajePremium = (cantidadPremium / capacidadPremium) * 100;
+    double porcentajePremium = (cantidadPremium / capacidadPremium) * 100; // cambiar la manera en que se verifica la fuga
     double porcentajeEcoExtra = (cantidadEcoExtra / capacidadEcoExtra) * 100;
 
     cout << "Verificación de fugas:\n";
