@@ -1,6 +1,7 @@
 #include "red_nacional.h"
 #include <iostream>
-
+#include <cstdlib>
+#include <fstream>
 int RedNacional::contadorEstaciones = 0;
 
 RedNacional::RedNacional(std::string nombre) : nombreEmpresa(nombre), numeroEstaciones(0) {}
