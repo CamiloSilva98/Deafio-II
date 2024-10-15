@@ -1,6 +1,7 @@
 #include "red_nacional.h"
 #include <iostream>
-
+#include <cstdlib>
+#include <fstream>
 int RedNacional::contadorEstaciones = 0;
 
 RedNacional::RedNacional(std::string nombre) : nombreEmpresa(nombre), numeroEstaciones(0) {}
@@ -10,7 +11,28 @@ RedNacional::~RedNacional() {
         delete estaciones[i];
     }
 }
+void RedNacional::guardarDatos() const
+{
+    // Guardar estaciones en el archivo "estaciones.txt"
+    ofstream archivoEstaciones("estaciones.txt");
+    if (!archivoEstaciones)
+    {
+        cout << "No se pudo abrir el archivo estaciones.txt para guardar.\n";
+        return;
+    }
 
+    for (int i = 0; i < numEstaciones; ++i) {
+        EstacionServicio* estacion = estaciones[i];
+        archivoEstaciones <<"Nombre: "<< estacion->obtenerNombre() << ", Codigo: "
+                          << estacion->codigo << ", Gerente: "
+                          << estacion->gerente << ", Region: "
+                          << estacion->region << ", Latitud: "
+                          << estacion->latitud << ", Longitud: "
+                          << estacion->longitud << "\n";
+
+        // Guardar surtidores de cada estación
+        estacion->guardarSurtidores();
+    }
 void RedNacional::agregarEstacion(EstacionServicio* nuevaEstacion) {
     if (numeroEstaciones < 100) {
         estaciones[numeroEstaciones++] = nuevaEstacion;
