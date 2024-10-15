@@ -1,6 +1,8 @@
-#include "RedNacional.h"
+#include "rednacional.h"
 #include <iostream>
 #include <cstdlib>
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 RedNacional::RedNacional() : numEstaciones(0) {
@@ -14,7 +16,64 @@ RedNacional::~RedNacional() {
         delete estaciones[i];
     }
 }
+void RedNacional::cargarDatos() {
+    ifstream archivoEstaciones("estaciones.txt");
+    if (!archivoEstaciones) {
+        cout << "No se pudo abrir el archivo estaciones.txt para cargar.\n";
+        return;
+    }
 
+    string linea;
+    while (getline(archivoEstaciones, linea)) {
+        stringstream ss(linea);
+        string nombre, gerente, region;
+        int codigo;
+        double latitud, longitud;
+
+        getline(ss, nombre, ',');
+        ss >> codigo;
+        ss.ignore();  // Ignorar la coma
+        getline(ss, gerente, ',');
+        getline(ss, region, ',');
+        ss >> latitud;
+        ss.ignore();
+        ss >> longitud;
+
+        EstacionServicio* nuevaEstacion = new EstacionServicio(nombre, codigo, gerente, region, latitud, longitud);
+        estaciones[numEstaciones++] = nuevaEstacion;
+
+        // Cargar surtidores de esta estación
+        nuevaEstacion->cargarSurtidores();
+    }
+
+    archivoEstaciones.close();
+}
+void RedNacional::guardarDatos() const
+{
+    // Guardar estaciones en el archivo "estaciones.txt"
+    ofstream archivoEstaciones("estaciones.txt");
+    if (!archivoEstaciones)
+    {
+        cout << "No se pudo abrir el archivo estaciones.txt para guardar.\n";
+        return;
+    }
+
+    for (int i = 0; i < numEstaciones; ++i) {
+        EstacionServicio* estacion = estaciones[i];
+        archivoEstaciones <<"Nombre: "<< estacion->obtenerNombre() << ", Codigo: "
+                          << estacion->codigo << ", Gerente: "
+                          << estacion->gerente << ", Region: "
+                          << estacion->region << ", Latitud: "
+                          << estacion->latitud << ",Longitud: "
+                          << estacion->longitud << "\n";
+
+        // Guardar surtidores de cada estación
+        estacion->guardarSurtidores();
+    }
+
+    archivoEstaciones.close();
+    cout << "Datos de la red nacional guardados con éxito.\n";
+}
 void RedNacional::agregarEstacionServicio() {
     if (numEstaciones < MAX_ESTACIONES) {
         std::string nombre, gerente, region;

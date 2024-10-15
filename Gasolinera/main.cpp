@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-#include "RedNacional.h"
+#include "rednacional.h"
 using namespace std;
 
 void mostrarMenu() {
@@ -18,6 +18,7 @@ int main() {
     srand(static_cast<unsigned int>(time(nullptr)));
 
     RedNacional redNacional;
+    redNacional.cargarDatos();
     int opcion;
 
     do {
@@ -38,7 +39,8 @@ int main() {
             redNacional.simulacionVentas();
             break;
         case 0:
-            cout << "Saliendo del programa...\n";
+            cout << "Guardando datos y saliendo del programa...\n";
+            redNacional.guardarDatos();  // Guardar los datos al salir
             break;
         default:
             cout << "Opción no valida. Intente de nuevo.\n";

@@ -1,26 +1,70 @@
 #include "EstacionServicio.h"
 #include <iostream>
 #include <cstdlib>
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 EstacionServicio::EstacionServicio(const string& nombre, int codigo, const string& gerente,
                                    const string& region, double latitud, double longitud)
     : nombre(nombre), codigo(codigo), gerente(gerente), region(region),
-    latitud(latitud), longitud(longitud), numSurtidores(0) {
-    for (int i = 0; i < MAX_SURTIDORES; ++i) {
+    latitud(latitud), longitud(longitud), numSurtidores(0)
+{
+    for (int i = 0; i < MAX_SURTIDORES; ++i)
+    {
         surtidores[i] = nullptr;
     }
     tanque.asignarCapacidades();
 }
 
-EstacionServicio::~EstacionServicio() {
-    for (int i = 0; i < numSurtidores; ++i) {
+EstacionServicio::~EstacionServicio()
+{
+    for (int i = 0; i < numSurtidores; ++i)
+    {
         delete surtidores[i];
     }
 }
+void EstacionServicio::cargarSurtidores()
+{
+    string nombreArchivo = "surtidores_" + to_string(codigo) + ".txt";
+    ifstream archivoSurtidores(nombreArchivo);
+    if (!archivoSurtidores)
+    {
+        cout << "No se pudo abrir el archivo " << nombreArchivo << " para cargar surtidores.\n";
+        return;
+    }
 
-void EstacionServicio::agregarSurtidor() {
-    if (numSurtidores < MAX_SURTIDORES) {
+    string linea;
+    while (getline(archivoSurtidores, linea))
+    {
+        stringstream ss(linea);
+        int codigoSurtidor;
+        string modelo;
+        bool activo;
+
+        ss >> codigoSurtidor;
+        ss.ignore();
+        getline(ss, modelo, ',');
+        ss >> activo;
+
+        Surtidor* nuevoSurtidor = new Surtidor(codigoSurtidor, modelo);
+        if (!activo)
+        {
+            nuevoSurtidor->cambiarEstado();  // Desactivar si estaba inactivo
+        }
+
+        surtidores[numSurtidores++] = nuevoSurtidor;
+
+        // Cargar transacciones de este surtidor
+        nuevoSurtidor->cargarTransacciones();
+    }
+
+    archivoSurtidores.close();
+}
+void EstacionServicio::agregarSurtidor()
+{
+    if (numSurtidores < MAX_SURTIDORES)
+    {
         int codigo;
         string modelo;
         cout << "Ingrese el codigo del surtidor: ";
@@ -30,11 +74,22 @@ void EstacionServicio::agregarSurtidor() {
         surtidores[numSurtidores] = new Surtidor(codigo, modelo);
         numSurtidores++;
         cout << "Surtidor agregado con exito.\n";
-    } else {
+    }
+    else
+    {
         cout << "No se pueden agregar mas surtidores.\n";
     }
 }
-
+void EstacionServicio::guardarSurtidores() const
+{
+    // Crear un archivo para los surtidores de esta estación
+    string nombreArchivo = "surtidores_" + to_string(codigo) + ".txt";
+    ofstream archivoSurtidores(nombreArchivo);
+    if (!archivoSurtidores) {
+        cout << "No se pudo abrir el archivo " << nombreArchivo << " para guardar surtidores.\n";
+        return;
+    }
+}
 void EstacionServicio::eliminarSurtidor() {
     if (numSurtidores == 0) {
         cout << "No hay surtidores para eliminar.\n";

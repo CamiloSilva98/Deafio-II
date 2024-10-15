@@ -1,10 +1,41 @@
-#include "Surtidor.h"
+#include "surtidor.h"
 #include <iostream>
 #include <iomanip>
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 Surtidor::Surtidor(int codigo, const string& modelo)
     : codigo(codigo), modelo(modelo), activo(true), numTransacciones(0) {}
+
+void Surtidor::cargarTransacciones() {
+    string nombreArchivo = "transacciones_" + to_string(codigo) + ".txt";
+    ifstream archivoTransacciones(nombreArchivo);
+    if (!archivoTransacciones) {
+        cout << "No se pudo abrir el archivo " << nombreArchivo << " para cargar transacciones.\n";
+        return;
+    }
+
+    string linea;
+    while (getline(archivoTransacciones, linea)) {
+        stringstream ss(linea);
+        Transaccion nuevaTransaccion;
+
+        ss >> nuevaTransaccion.fecha;
+        ss.ignore();
+        getline(ss, nuevaTransaccion.categoria, ',');
+        ss >> nuevaTransaccion.cantidad;
+        ss.ignore();
+        getline(ss, nuevaTransaccion.metodoPago, ',');
+        ss >> nuevaTransaccion.numeroDocumentoCliente;
+        ss.ignore();
+        ss >> nuevaTransaccion.montoTotal;
+
+        transacciones[numTransacciones++] = nuevaTransaccion;
+    }
+
+    archivoTransacciones.close();
+}
 
 void Surtidor::registrarVenta(const string& categoria, double cantidad, const string& metodoPago,
                               int numeroDocumentoCliente, double montoTotal) {

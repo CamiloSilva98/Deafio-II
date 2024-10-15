@@ -17,11 +17,12 @@ public:
     void eliminarEstacionServicio();
     void calcularVentasTotales() const;
     void fijarPreciosCombustible();
-
+    void cargarDatos();
     void gestionRedNacional();
     void gestionEstacionesServicio();
     void verificacionFugas();
     void simulacionVentas();
+    void guardarDatos() const;
 
 private:
     EstacionServicio* seleccionarEstacion() const;
