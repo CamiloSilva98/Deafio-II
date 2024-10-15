@@ -1,33 +1,30 @@
-#ifndef RED_NACIONAL_H
-#define RED_NACIONAL_H
+#ifndef REDNACIONAL_H
+#define REDNACIONAL_H
 
-#include "estacion_servicio.h"
-#include <string>
+#include "EstacionServicio.h"
 
 class RedNacional {
 private:
-    std::string nombreEmpresa;
-    static int contadorEstaciones;
-    EstacionServicio* estaciones[100]; // Arreglo para almacenar estaciones
-    int numeroEstaciones;
+    static const int MAX_ESTACIONES = 100;
+    EstacionServicio* estaciones[MAX_ESTACIONES];
+    int numEstaciones;
 
 public:
-    RedNacional(std::string nombre);
+    RedNacional();
     ~RedNacional();
 
-    void agregarEstacion(EstacionServicio* nuevaEstacion);
-    void eliminarEstacion(int codigo);
+    void agregarEstacionServicio();
+    void eliminarEstacionServicio();
+    void calcularVentasTotales() const;
+    void fijarPreciosCombustible();
 
-    void fijarPrecios(float regular, float premium, float ecoExtra);
-    float calcularVentasTotales() const;
+    void gestionRedNacional();
+    void gestionEstacionesServicio();
+    void verificacionFugas();
+    void simulacionVentas();
 
-    void agregarSurtidorAEstacion(int codigoEstacion, Surtidor* nuevoSurtidor);
-    void eliminarSurtidorDeEstacion(int codigoEstacion, int codigoSurtidor);
-    void fijarPreciosEnEstacion(int codigoEstacion, float regular, float premium, float ecoExtra);
-    void simularVenta(int codigoEstacion, int cantidadLitros, std::string categoria, std::string metodoPago, std::string docCliente);
-    void reportarVentasDeEstacion(int codigoEstacion) const;
-
-    static int obtenerContador();
+private:
+    EstacionServicio* seleccionarEstacion() const;
 };
 
-#endif // RED_NACIONAL_H
+#endif // REDNACIONAL_H

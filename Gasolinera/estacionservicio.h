@@ -1,36 +1,45 @@
-#ifndef ESTACION_SERVICIO_H
-#define ESTACION_SERVICIO_H
+#ifndef ESTACIONSERVICIO_H
+#define ESTACIONSERVICIO_H
 
-#include "tanque.h"
-#include "surtidor.h"
 #include <string>
+#include "Tanque.h"
+#include "Surtidor.h"
+using namespace std;
 
 class EstacionServicio {
 private:
-    std::string nombre;
+    string nombre;
     int codigo;
-    std::string gerente;
-    std::string region;
-    std::string ubicacionGPS;
+    string gerente;
+    string region;
+    double latitud;
+    double longitud;
     Tanque tanque;
-    Surtidor* surtidores[12]; // Máximo de 12 surtidores
+    static const int MAX_SURTIDORES = 12;
+    Surtidor* surtidores[MAX_SURTIDORES];
     int numSurtidores;
 
 public:
-    EstacionServicio(std::string nombre, int codigo, std::string gerente, std::string region, std::string ubicacionGPS);
+    EstacionServicio(const string& nombre, int codigo, const string& gerente,
+                     const string& region, double latitud, double longitud);
     ~EstacionServicio();
 
-    void agregarSurtidor(Surtidor* nuevoSurtidor);
-    void eliminarSurtidor(int codigoSurtidor);
-    void fijarPrecios(float regular, float premium, float ecoExtra);
-    float calcularVentas() const;
+    void agregarSurtidor();
+    void eliminarSurtidor();
+    void activarDesactivarSurtidor();
+    void consultarTransacciones() const;
+    void reportarLitrosVendidos() const;
+    void simularVenta();
+    void verificarFugas() const;
+    void calcularVentasTotales() const;
+    void fijarPrecios(double regular, double premium, double ecoExtra);
+    bool tieneHurtirsActivos() const;
 
-    void reportarVentas() const;
-    void simularVenta(int cantidadLitros, std::string categoria, std::string metodoPago, std::string docCliente);
+    void gestionarEstacion();
 
-    int getCodigo() const { return codigo; }
+    string obtenerNombre() const { return nombre; }
 
-    friend class RedNacional; // RedNacional tiene acceso a los detalles de esta clase
+    friend class RedNacional;
 };
 
-#endif // ESTACION_SERVICIO_H
+#endif // ESTACIONSERVICIO_H
