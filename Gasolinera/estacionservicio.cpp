@@ -1,4 +1,4 @@
-#include "EstacionServicio.h"
+#include "estacionservicio.h"
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
@@ -192,31 +192,31 @@ void EstacionServicio::simularVenta() {
     double cantidadDisponible = tanque.obtenerCantidad(categoriaCombustible);
     double cantidadVendida = (cantidadSolicitada <= cantidadDisponible) ? cantidadSolicitada : cantidadDisponible;
 
-    if (cantidadVendida > 0) {
-        tanque.restarCantidad(categoriaCombustible, cantidadVendida);
-        double precioTotal = cantidadVendida * tanque.obtenerPrecio(categoriaCombustible);
+    tanque.restarCantidad(categoriaCombustible, cantidadVendida);
+    double precioTotal = cantidadVendida * tanque.obtenerPrecio(estaciones&, categoriaCombustible);
 
-        string metodoPago;
-        switch (rand() % 3) {
-        case 0: metodoPago = "Efectivo"; break;
-        case 1: metodoPago = "TDebito"; break;
-        case 2: metodoPago = "TCredito"; break;
-        }
-
-        int numeroDocumentoCliente = 10000000 + (rand() % 90000000); // Número aleatorio de 8 dígitos
-
-        surtidorSeleccionado->registrarVenta(categoriaCombustible, cantidadVendida, metodoPago, numeroDocumentoCliente, precioTotal);
-
-        cout << "Venta simulada con exito:\n";
-        cout << "Surtidor: " << surtidorSeleccionado->obtenerCodigo() << "\n";
-        cout << "Combustible: " << categoriaCombustible << "\n";
-        cout << "Cantidad: " << cantidadVendida << " litros\n";
-        cout << "Precio total: $" << precioTotal << "\n";
-        cout << "Metodo de pago: " << metodoPago << "\n";
-        cout << "Numero de documento del cliente: " << numeroDocumentoCliente << "\n";
-    } else {
-        cout << "No hay suficiente combustible disponible para realizar la venta.\n";
+    string metodoPago;
+    switch (rand() % 3) {
+    case 0: metodoPago = "Efectivo"; break;
+    case 1: metodoPago = "TDebito"; break;
+    case 2: metodoPago = "TCredito"; break;
     }
+
+
+    int numeroDocumentoCliente = 10000000 + (rand() % 90000000); // Número aleatorio de 8 dígitos
+    if(cantidadSolicitada > cantidadDisponible)
+    {
+        cantidadSolicitada=cantidadDisponible;
+    }
+    surtidorSeleccionado->registrarVenta(categoriaCombustible, cantidadVendida, metodoPago, numeroDocumentoCliente, precioTotal);
+
+    cout << "Venta simulada con exito:\n";
+    cout << "Surtidor: " << surtidorSeleccionado->obtenerCodigo() << "\n";
+    cout << "Combustible: " << categoriaCombustible << "\n";
+    cout << "Cantidad: " << cantidadVendida << " litros\n";
+    cout << "Precio total: $" << precioTotal << "\n";
+    cout << "Metodo de pago: " << metodoPago << "\n";
+    cout << "Numero de documento del cliente: " << numeroDocumentoCliente << "\n";
 }
 
 void EstacionServicio::verificarFugas() const {
