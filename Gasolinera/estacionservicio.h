@@ -12,6 +12,9 @@ private:
     int codigo;
     string gerente;
     string region;
+    double precioRegular;
+    double precioPremium;
+    double precioEcoExtra;
     double latitud;
     double longitud;
     Tanque tanque;
@@ -45,6 +48,9 @@ public:
     string obtenerRegion() const { return region; }
     double obtenerLatitud() const { return latitud; }
     double obtenerLongitud() const { return longitud; }
+    double obtenerPrecioRegular() const { return precioRegular; }
+    double obtenerPrecioPremium() const { return precioPremium; }
+    double obtenerPrecioEcoExtra() const { return precioEcoExtra; }
 
     friend class RedNacional;  // Permite a RedNacional acceder a los atributos privados
 };
