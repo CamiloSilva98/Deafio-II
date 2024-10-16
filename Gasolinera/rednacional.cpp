@@ -60,11 +60,11 @@ void RedNacional::guardarDatos() const
 
     for (int i = 0; i < numEstaciones; ++i) {
         EstacionServicio* estacion = estaciones[i];
-        archivoEstaciones <<"Nombre: "<< estacion->obtenerNombre() << ", Codigo: "
-                          << estacion->codigo << ", Gerente: "
-                          << estacion->gerente << ", Region: "
-                          << estacion->region << ", Latitud: "
-                          << estacion->latitud << ",Longitud: "
+        archivoEstaciones<< estacion->obtenerNombre() << ", "
+                          << estacion->codigo << ", "
+                          << estacion->gerente << ", "
+                          << estacion->region << ", "
+                          << estacion->latitud << ", "
                           << estacion->longitud << "\n";
 
         // Guardar surtidores de cada estación

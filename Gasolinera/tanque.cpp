@@ -1,4 +1,5 @@
-#include "Tanque.h"
+#include "tanque.h"
+#include "EstacionServicio.h"
 #include <iostream>
 #include <cstdlib>
 using namespace std;
@@ -41,23 +42,67 @@ void Tanque::restarCantidad(const std::string& categoria, double cantidad)
 }
 
 double Tanque::obtenerCantidad(const std::string& categoria) const {
-    if (categoria == "Regular") {
+
+    if (categoria == "Regular")
+    {
+
         return cantidadRegular;
-    } else if (categoria == "Premium") {
+    }
+    else if (categoria == "Premium")
+    {
         return cantidadPremium;
-    } else if (categoria == "EcoExtra") {
+    }
+    else if (categoria == "EcoExtra")
+    {
         return cantidadEcoExtra;
     }
     return 0;
 }
 
-double Tanque::obtenerPrecio(const std::string& categoria) const {
-    if (categoria == "Regular") {
-        return precioRegular;
-    } else if (categoria == "Premium") {
-        return precioPremium;
-    } else if (categoria == "EcoExtra") {
-        return precioEcoExtra;
+double Tanque::obtenerPrecio(const std::string& categoria) const
+{
+    float precioNorteRegular, precioSurRegular, precioNortePremium,
+        precioSurPremium, precioNorteEco, precioSurEco;
+    EstacionServicio* estacion;
+    if (categoria == "Regular")
+    {
+        if(estacion->obtenerRegion() == "norte")
+        {
+            precioNorteRegular=precioRegular*1.03f;
+            return precioNorteRegular;
+        }
+        else if(estacion->obtenerRegion() == "sur")
+        {
+            precioSurRegular=precioRegular*1.05f;
+            return precioSurRegular;
+        }
+
+    }
+    else if (categoria == "Premium")
+    {
+        if(estacion->obtenerRegion() == "norte")
+        {
+            precioNortePremium=precioPremium*1.03f;
+            return precioNortePremium;
+        }
+        if(estacion->obtenerRegion() == "sur")
+        {
+            precioSurPremium=precioPremium*1.05f;
+            return precioSurPremium;
+        }
+    }
+    else if (categoria == "EcoExtra")
+    {
+        if(estacion->obtenerRegion() == "norte")
+        {
+            precioNorteEco=precioEcoExtra*1.03f;
+            return precioNorteEco;
+        }
+        if(estacion->obtenerRegion() == "sur")
+        {
+            precioSurEco=precioPremium*1.05f;
+            return precioSurEco;
+        }
     }
     return 0;
 }
