@@ -11,19 +11,37 @@ void mostrarMenu() {
     cout << "3. Verificacion de fugas\n";
     cout << "4. Simulacion de ventas\n";
     cout << "0. Salir\n";
-    cout << "Seleccione una opcion: ";
+    cout << "Seleccione una opcion: \n";
 }
 
 int main() {
     srand(static_cast<unsigned int>(time(nullptr)));
-
     RedNacional redNacional;
     redNacional.cargarDatos();
     int opcion;
+    string entrada;
 
     do {
         mostrarMenu();
-        cin >> opcion;
+
+        while (true) {
+            cout << "Ingrese su opcion: ";
+            getline(cin, entrada);
+
+            // Intenta convertir la entrada a un número
+            try {
+                opcion = stoi(entrada);
+                break; // Si la conversión es exitosa, sal del bucle
+            }
+            catch (const invalid_argument&) {
+                cout << "Error: Debe ingresar un numero. Por favor, elija una de las opciones mostradas en el menu.\n";
+                mostrarMenu();
+            }
+            catch (const out_of_range&) {
+                cout << "Error: El numero ingresado es demasiado grande. Por favor, elija una de las opciones mostradas en el menu.\n";
+                mostrarMenu();
+            }
+        }
 
         switch (opcion) {
         case 1:
@@ -43,7 +61,7 @@ int main() {
             redNacional.guardarDatos();  // Guardar los datos al salir
             break;
         default:
-            cout << "Opción no valida. Intente de nuevo.\n";
+            cout << "Opcion no valida. Intente de nuevo.\n";
         }
     } while (opcion != 0);
 
