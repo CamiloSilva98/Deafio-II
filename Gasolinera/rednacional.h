@@ -1,7 +1,7 @@
 #ifndef REDNACIONAL_H
 #define REDNACIONAL_H
 
-#include "EstacionServicio.h"
+#include "estacionservicio.h"
 
 class RedNacional {
 private:

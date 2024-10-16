@@ -2,6 +2,7 @@
 #define TANQUE_H
 
 #include <string>
+class EstacionServicio;
 using namespace std;
 
 class Tanque
