@@ -193,7 +193,7 @@ void EstacionServicio::simularVenta() {
     double cantidadVendida = (cantidadSolicitada <= cantidadDisponible) ? cantidadSolicitada : cantidadDisponible;
 
     tanque.restarCantidad(categoriaCombustible, cantidadVendida);
-    double precioTotal = cantidadVendida * tanque.obtenerPrecio(estaciones&, categoriaCombustible);
+    double precioTotal = cantidadVendida * tanque.obtenerPrecio(categoriaCombustible);
 
     string metodoPago;
     switch (rand() % 3) {
