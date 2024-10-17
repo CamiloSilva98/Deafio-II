@@ -1,4 +1,3 @@
-
 #include "rednacional.h"
 #include <iostream>
 #include <cstdlib>

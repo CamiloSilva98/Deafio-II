@@ -37,7 +37,7 @@ float RedNacional::obtenerPrecio(const std::string& categoria) const {
 
 }
 void RedNacional::actualizarPreciosPorDia()
-{//editar
+{
     precioRegular *= 1.01;
     precioPremium *= 1.01;
     precioEcoExtra *= 1.01;
@@ -64,12 +64,13 @@ float RedNacional::calcularPrecioConRegion(const string& categoria, const string
         std::cerr << "Categoría no válida\n";
         return 0.0;
     }
+    cout<<"|"<<region;
     // Ajustar el precio según la región
-    if (region == "  norte")
+    if (region == "norte")
     {
         precioBase = precioBase*1.05;
     }
-    else if (region == "  sur")
+    else if (region == "sur")
     {
         precioBase = precioBase*1.02;
     }
@@ -196,7 +197,7 @@ void RedNacional::agregarEstacionServicio() {
             if (region != "norte" && region != "centro" && region != "sur") {
                 cout << "Error: Region invalida. Ingrese Norte, Centro o Sur.\n";
             }
-        } while (region != "Norte" && region != "Centro" && region != "Sur");
+        } while (region != "norte" && region != "centro" && region != "sur");
         cout << "Ingrese la latitud: ";
         while (!(cin >> latitud)) {
             cout << "Error: Ingrese un numero valido para la latitud.\n";
