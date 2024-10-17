@@ -134,12 +134,12 @@ void RedNacional::guardarDatos()
         // Guardar surtidores de cada estación
         estacion->guardarSurtidores();
     }
-
+//8
     archivoEstaciones.close();
     ifstream archivoPrecios("precios.txt");
     if (!archivoPrecios)
     {
-        cout << "No se pudo abrir el archivo precios.\n";
+        cout << "No se pudo abrir el archivo precios.txt.\n";
         return;
     }
     string categoria;
