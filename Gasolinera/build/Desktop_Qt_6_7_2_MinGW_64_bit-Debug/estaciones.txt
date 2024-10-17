@@ -1,4 +1,6 @@
-Nari¤o,21,camilo,norte,48,12
+
+NariÂ¤o,21,camilo,norte,48,12
 Antioquia,48754,brayan,sur,878,8
 Santander,100021,Sebas,centro,2,98
 Medellin,18850,chente,sur,54,26
+
