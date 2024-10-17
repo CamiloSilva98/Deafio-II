@@ -1,4 +1,4 @@
-#include "estacionservicio.h"
+
 #include "rednacional.h"
 #include <iostream>
 #include <cstdlib>
@@ -199,15 +199,14 @@ void EstacionServicio::simularVenta() {
     double cantidadVendida = (cantidadSolicitada <= cantidadDisponible) ? cantidadSolicitada : cantidadDisponible;
 
     tanque.restarCantidad(categoriaCombustible, cantidadVendida);
-    double precioTotal = cantidadVendida * redNacional->calcularPrecioConRegion(categoriaCombustible, obtenerRegion());
-
+    float precioTotal = cantidadVendida * redNacional->calcularPrecioConRegion(categoriaCombustible, obtenerRegion());
     string metodoPago;
-    switch (rand() % 3) {
+    switch (rand() % 3)
+    {
     case 0: metodoPago = "Efectivo"; break;
     case 1: metodoPago = "TDebito"; break;
     case 2: metodoPago = "TCredito"; break;
     }
-
 
     int numeroDocumentoCliente = 10000000 + (rand() % 90000000); // Número aleatorio de 8 dígitos
     surtidorSeleccionado->registrarVenta(categoriaCombustible, cantidadVendida, metodoPago, numeroDocumentoCliente, precioTotal);
@@ -237,11 +236,6 @@ void EstacionServicio::calcularVentasTotales() const {
     cout << "Regular: $" << regularTotal << "\n";
     cout << "Premium: $" << premiumTotal << "\n";
     cout << "EcoExtra: $" << ecoExtraTotal << "\n";
-}
-
-void EstacionServicio::fijarPrecios(double regular, double premium, double ecoExtra) {
-    tanque.fijarPrecios(regular, premium, ecoExtra);
-    cout << "Precios actualizados para la estacion " << nombre << ".\n";
 }
 
 bool EstacionServicio::tieneHurtirsActivos() const {

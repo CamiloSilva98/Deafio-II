@@ -1,4 +1,6 @@
 #include "rednacional.h"
+#include "tanque.h"
+#include "estacionservicio.h"
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
@@ -17,47 +19,59 @@ RedNacional::~RedNacional() {
         delete estaciones[i];
     }
 }
-void RedNacional::fijarPreciosBase(double regular, double premium, double ecoExtra) {
-    precioBaseRegular = regular;
-    precioBasePremium = premium;
-    precioBaseEcoExtra = ecoExtra;
+void RedNacional::fijarPrecios(float regular, float premium, float ecoExtra)
+{
+    precioRegular = regular;
+    precioPremium = premium;
+    precioEcoExtra = ecoExtra;
+}
+float RedNacional::obtenerPrecio(const std::string& categoria) const {
+    if (categoria == "Regular") {
+        return precioRegular;
+    } else if (categoria == "Premium") {
+        return precioPremium;
+    } else if (categoria == "EcoExtra") {
+        return precioEcoExtra;
+    }
+    return 0;
+
 }
 void RedNacional::actualizarPreciosPorDia()
 {//editar
-    precioBaseRegular *= 1.01;
-    precioBasePremium *= 1.01;
-    precioBaseEcoExtra *= 1.01;
+    precioRegular *= 1.01;
+    precioPremium *= 1.01;
+    precioEcoExtra *= 1.01;
 }
-double RedNacional::calcularPrecioConRegion(const std::string& categoria, const std::string& region) const
+float RedNacional::calcularPrecioConRegion(const string& categoria, const string& region) const
 {
-    double precioBase = 0.0;
+    float precioBase = 0.0;
 
     // Determina el precio base según la categoría
     if (categoria == "Regular")
     {
-        precioBase = precioBaseRegular;
+        precioBase = obtenerPrecio("Regular");
     }
     else if (categoria == "Premium")
     {
-        precioBase = precioBasePremium;
-    } else if (categoria == "EcoExtra")
+        precioBase = obtenerPrecio("Premium");
+    }
+    else if (categoria == "EcoExtra")
     {
-        precioBase = precioBaseEcoExtra;
+        precioBase = obtenerPrecio("EcoExtra");
     }
     else
     {
         std::cerr << "Categoría no válida\n";
         return 0.0;
     }
-
     // Ajustar el precio según la región
-    if (region == "norte")
+    if (region == "  norte")
     {
-        return precioBase * 1.05;
+        precioBase = precioBase*1.05;
     }
-    else if (region == "sur")
+    else if (region == "  sur")
     {
-        return precioBase * 1.02;
+        precioBase = precioBase*1.02;
     }
     return precioBase;
 }
@@ -133,7 +147,8 @@ void RedNacional::agregarEstacionServicio() {
         cin >> gerente;
         cout << "Ingrese la region (Norte/Centro/Sur): ";
         cin >> region;
-        for (char& c : region) {
+        for (char& c : region)
+        {
             c =tolower(c);
         }
         cout << "Ingrese la latitud: ";
@@ -177,17 +192,17 @@ void RedNacional::calcularVentasTotales() const {
 }
 
 void RedNacional::fijarPreciosCombustible() {
-    double precioRegular, precioPremium, precioEcoExtra;
+    float precioRegular, precioPremium, precioEcoExtra;
     cout << "Ingrese el nuevo precio para combustible Regular: ";
     cin >> precioRegular;
     cout << "Ingrese el nuevo precio para combustible Premium: ";
     cin >> precioPremium;
     cout << "Ingrese el nuevo precio para combustible EcoExtra: ";
     cin >> precioEcoExtra;
-
-    for (int i = 0; i < numEstaciones; ++i) {
-        estaciones[i]->fijarPrecios(precioRegular, precioPremium, precioEcoExtra);
-    }
+    fijarPrecios(precioRegular, precioPremium, precioEcoExtra);
+    //for (int i = 0; i < numEstaciones; ++i) {
+       // estaciones[i]->fijarPrecios(precioRegular, precioPremium, precioEcoExtra);
+    //}
     cout << "Precios actualizados para todas las estaciones.\n";
 }
 

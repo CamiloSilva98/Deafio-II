@@ -33,7 +33,7 @@ public:
     void simularVenta();
     void verificarFugas() const;
     void calcularVentasTotales() const;
-    void fijarPrecios(double regular, double premium, double ecoExtra);
+   // void fijarPrecios(float regular, float premium, float ecoExtra);
     bool tieneHurtirsActivos() const;
     void guardarSurtidores() const;
     void gestionarEstacion();
