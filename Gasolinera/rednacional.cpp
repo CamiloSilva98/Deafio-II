@@ -275,6 +275,7 @@ void RedNacional::fijarPreciosCombustible() {
         cin.ignore(10000, '\n');
         cout << "Ingrese el nuevo precio para combustible EcoExtra: ";
     }
+    fijarPrecios(precioRegular, precioPremium, precioEcoExtra);
     cout << "Precios actualizados para todas las estaciones.\n";
 }
 
