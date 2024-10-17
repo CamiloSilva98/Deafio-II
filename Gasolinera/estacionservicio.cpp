@@ -1,4 +1,5 @@
 #include "estacionservicio.h"
+#include "rednacional.h"
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
@@ -6,9 +7,9 @@
 using namespace std;
 
 EstacionServicio::EstacionServicio(const string& nombre, int codigo, const string& gerente,
-                                   const string& region, double latitud, double longitud)
+                                   const string& region, double latitud, double longitud, RedNacional* red)
     : nombre(nombre), codigo(codigo), gerente(gerente), region(region),
-    latitud(latitud), longitud(longitud), numSurtidores(0)
+    latitud(latitud), longitud(longitud), numSurtidores(0), redNacional(red)
 {
     for (int i = 0; i < MAX_SURTIDORES; ++i)
     {
@@ -23,6 +24,11 @@ EstacionServicio::~EstacionServicio()
     {
         delete surtidores[i];
     }
+}
+double EstacionServicio::obtenerPrecioCombustible(const string& categoria) const
+{
+    // Llamar a la función de RedNacional para obtener el precio ajustado
+    return redNacional->calcularPrecioConRegion(categoria, region);
 }
 void EstacionServicio::cargarSurtidores()
 {
@@ -193,7 +199,7 @@ void EstacionServicio::simularVenta() {
     double cantidadVendida = (cantidadSolicitada <= cantidadDisponible) ? cantidadSolicitada : cantidadDisponible;
 
     tanque.restarCantidad(categoriaCombustible, cantidadVendida);
-    double precioTotal = cantidadVendida * tanque.obtenerPrecio(categoriaCombustible);
+    double precioTotal = cantidadVendida * redNacional->calcularPrecioConRegion(categoriaCombustible, obtenerRegion());
 
     string metodoPago;
     switch (rand() % 3) {
@@ -204,10 +210,6 @@ void EstacionServicio::simularVenta() {
 
 
     int numeroDocumentoCliente = 10000000 + (rand() % 90000000); // Número aleatorio de 8 dígitos
-    if(cantidadSolicitada > cantidadDisponible)
-    {
-        cantidadSolicitada=cantidadDisponible;
-    }
     surtidorSeleccionado->registrarVenta(categoriaCombustible, cantidadVendida, metodoPago, numeroDocumentoCliente, precioTotal);
 
     cout << "Venta simulada con exito:\n";

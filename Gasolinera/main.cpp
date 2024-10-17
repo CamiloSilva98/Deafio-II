@@ -10,7 +10,7 @@ void mostrarMenu() {
     cout << "2. Gestion de estaciones de servicio\n";
     cout << "3. Verificacion de fugas\n";
     cout << "4. Simulacion de ventas\n";
-    cout << "0. Salir\n";
+    cout << "0. Guardar y Salir\n";
     cout << "Seleccione una opcion: \n";
 }
 

@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <sstream>
+#include <cctype>
 using namespace std;
 
 RedNacional::RedNacional() : numEstaciones(0) {
@@ -15,6 +16,50 @@ RedNacional::~RedNacional() {
     for (int i = 0; i < numEstaciones; ++i) {
         delete estaciones[i];
     }
+}
+void RedNacional::fijarPreciosBase(double regular, double premium, double ecoExtra) {
+    precioBaseRegular = regular;
+    precioBasePremium = premium;
+    precioBaseEcoExtra = ecoExtra;
+}
+void RedNacional::actualizarPreciosPorDia()
+{//editar
+    precioBaseRegular *= 1.01;
+    precioBasePremium *= 1.01;
+    precioBaseEcoExtra *= 1.01;
+}
+double RedNacional::calcularPrecioConRegion(const std::string& categoria, const std::string& region) const
+{
+    double precioBase = 0.0;
+
+    // Determina el precio base según la categoría
+    if (categoria == "Regular")
+    {
+        precioBase = precioBaseRegular;
+    }
+    else if (categoria == "Premium")
+    {
+        precioBase = precioBasePremium;
+    } else if (categoria == "EcoExtra")
+    {
+        precioBase = precioBaseEcoExtra;
+    }
+    else
+    {
+        std::cerr << "Categoría no válida\n";
+        return 0.0;
+    }
+
+    // Ajustar el precio según la región
+    if (region == "norte")
+    {
+        return precioBase * 1.05;
+    }
+    else if (region == "sur")
+    {
+        return precioBase * 1.02;
+    }
+    return precioBase;
 }
 void RedNacional::cargarDatos() {
     ifstream archivoEstaciones("estaciones.txt");
@@ -39,7 +84,7 @@ void RedNacional::cargarDatos() {
         ss.ignore();
         ss >> longitud;
 
-        EstacionServicio* nuevaEstacion = new EstacionServicio(nombre, codigo, gerente, region, latitud, longitud);
+        EstacionServicio* nuevaEstacion = new EstacionServicio(nombre, codigo, gerente, region, latitud, longitud, this);
         estaciones[numEstaciones++] = nuevaEstacion;
 
         // Cargar surtidores de esta estación
@@ -72,7 +117,7 @@ void RedNacional::guardarDatos() const
     }
 
     archivoEstaciones.close();
-    cout << "Datos de la red nacional guardados con éxito.\n";
+    cout << "Datos de la red nacional guardados con exito.\n";
 }
 void RedNacional::agregarEstacionServicio() {
     if (numEstaciones < MAX_ESTACIONES) {
@@ -88,12 +133,15 @@ void RedNacional::agregarEstacionServicio() {
         cin >> gerente;
         cout << "Ingrese la region (Norte/Centro/Sur): ";
         cin >> region;
+        for (char& c : region) {
+            c =tolower(c);
+        }
         cout << "Ingrese la latitud: ";
         cin >> latitud;
         cout << "Ingrese la longitud: ";
         cin >> longitud;
 
-        estaciones[numEstaciones] = new EstacionServicio(nombre, codigo, gerente, region, latitud, longitud);
+        estaciones[numEstaciones] = new EstacionServicio(nombre, codigo, gerente, region, latitud, longitud, this);
         numEstaciones++;
         cout << "Estacion de servicio agregada con exito.\n";
     } else {
