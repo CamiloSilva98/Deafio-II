@@ -106,8 +106,13 @@ void RedNacional::cargarDatos() {
     }
 
     archivoEstaciones.close();
+    ifstream archivoPrecios("precios.txt");
+    if (!archivoEstaciones) {
+        cout << "No se pudo abrir el archivo estaciones.txt para cargar.\n";
+        return;
+    }
 }
-void RedNacional::guardarDatos() const
+void RedNacional::guardarDatos()
 {
     // Guardar estaciones en el archivo "estaciones.txt"
     ofstream archivoEstaciones("estaciones.txt");
@@ -131,6 +136,25 @@ void RedNacional::guardarDatos() const
     }
 
     archivoEstaciones.close();
+    ifstream archivoPrecios("precios.txt");
+    if (!archivoPrecios)
+    {
+        cout << "No se pudo abrir el archivo precios.\n";
+        return;
+    }
+    string categoria;
+    float precio;
+    while (archivoPrecios >> categoria >> precio) {
+        if (categoria == "Regular") {
+            precioRegular = precio;
+        } else if (categoria == "Premium") {
+            precioPremium = precio;
+        } else if (categoria == "EcoExtra") {
+            precioEcoExtra = precio;
+        }
+    }
+
+    archivoPrecios.close();
     cout << "Datos de la red nacional guardados con exito.\n";
 }
 void RedNacional::agregarEstacionServicio() {

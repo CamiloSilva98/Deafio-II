@@ -31,7 +31,7 @@ public:
     void gestionEstacionesServicio();
     void verificacionFugas();
     void simulacionVentas();
-    void guardarDatos() const;
+    void guardarDatos();
 
 private:
     EstacionServicio* seleccionarEstacion() const;
