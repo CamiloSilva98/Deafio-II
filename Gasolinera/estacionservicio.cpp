@@ -196,18 +196,13 @@ void EstacionServicio::simularVenta() {
     double precioTotal = cantidadVendida * tanque.obtenerPrecio(categoriaCombustible);
 
     string metodoPago;
-    switch (rand() % 3) {
+    switch (rand() % 3)
+    {
     case 0: metodoPago = "Efectivo"; break;
     case 1: metodoPago = "TDebito"; break;
     case 2: metodoPago = "TCredito"; break;
     }
-
-
     int numeroDocumentoCliente = 10000000 + (rand() % 90000000); // Número aleatorio de 8 dígitos
-    if(cantidadSolicitada > cantidadDisponible)
-    {
-        cantidadSolicitada=cantidadDisponible;
-    }
     surtidorSeleccionado->registrarVenta(categoriaCombustible, cantidadVendida, metodoPago, numeroDocumentoCliente, precioTotal);
 
     cout << "Venta simulada con exito:\n";
