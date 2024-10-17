@@ -1,2 +1,11 @@
+<<<<<<< Updated upstream
 antioquia, 1021,   camilo,   sur, 152, 145
 santander, 4541,   Brayan,   norte, 985, 365
+=======
+Nari¤o,21,camilo,norte,48,12
+Antioquia,48754,brayan,sur,878,8
+Santander,100021,Sebas,centro,2,98
+Medellin,18850,chente,sur,54,26
+w2,21,aaq1,centro,4,-5
+w2,12,2w,norte,-1,2
+>>>>>>> Stashed changes
