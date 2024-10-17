@@ -22,17 +22,52 @@ void RedNacional::agregarEstacionServicio() {
         double latitud, longitud;
 
         cout << "Ingrese el nombre de la estacion: ";
-        cin >> nombre;
+        while (!(cin >> nombre)) {
+            cout << "Error: Ingrese un nombre valido.\n";
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "Ingrese el nombre de la estacion: ";
+        }
+
         cout << "Ingrese el codigo de la estacion: ";
-        cin >> codigo;
+        while (!(cin >> codigo)) {
+            cout << "Error: Ingrese un codigo numerico valido.\n";
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "Ingrese el codigo de la estacion: ";
+        }
+
         cout << "Ingrese el nombre del gerente: ";
-        cin >> gerente;
-        cout << "Ingrese la region (Norte/Centro/Sur): ";
-        cin >> region;
+        while (!(cin >> gerente)) {
+            cout << "Error: Ingrese un nombre valido.\n";
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "Ingrese el nombre del gerente: ";
+        }
+
+        do {
+            cout << "Ingrese la region (Norte/Centro/Sur): ";
+            cin >> region;
+            if (region != "Norte" && region != "Centro" && region != "Sur") {
+                cout << "Error: Region invalida. Ingrese Norte, Centro o Sur.\n";
+            }
+        } while (region != "Norte" && region != "Centro" && region != "Sur");
+
         cout << "Ingrese la latitud: ";
-        cin >> latitud;
+        while (!(cin >> latitud)) {
+            cout << "Error: Ingrese un numero valido para la latitud.\n";
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "Ingrese la latitud: ";
+        }
+
         cout << "Ingrese la longitud: ";
-        cin >> longitud;
+        while (!(cin >> longitud)) {
+            cout << "Error: Ingrese un numero valido para la longitud.\n";
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "Ingrese la longitud: ";
+        }
 
         estaciones[numEstaciones] = new EstacionServicio(nombre, codigo, gerente, region, latitud, longitud);
         numEstaciones++;
@@ -71,12 +106,30 @@ void RedNacional::calcularVentasTotales() const {
 
 void RedNacional::fijarPreciosCombustible() {
     double precioRegular, precioPremium, precioEcoExtra;
+
     cout << "Ingrese el nuevo precio para combustible Regular: ";
-    cin >> precioRegular;
+    while (!(cin >> precioRegular) || precioRegular < 0) {
+        cout << "Error: Ingrese un precio valido (mayor o igual a 0).\n";
+        cin.clear();
+        cin.ignore(10000, '\n');
+        cout << "Ingrese el nuevo precio para combustible Regular: ";
+    }
+
     cout << "Ingrese el nuevo precio para combustible Premium: ";
-    cin >> precioPremium;
+    while (!(cin >> precioPremium) || precioPremium < 0) {
+        cout << "Error: Ingrese un precio valido (mayor o igual a 0).\n";
+        cin.clear();
+        cin.ignore(10000, '\n');
+        cout << "Ingrese el nuevo precio para combustible Premium: ";
+    }
+
     cout << "Ingrese el nuevo precio para combustible EcoExtra: ";
-    cin >> precioEcoExtra;
+    while (!(cin >> precioEcoExtra) || precioEcoExtra < 0) {
+        cout << "Error: Ingrese un precio valido (mayor o igual a 0).\n";
+        cin.clear();
+        cin.ignore(10000, '\n');
+        cout << "Ingrese el nuevo precio para combustible EcoExtra: ";
+    }
 
     for (int i = 0; i < numEstaciones; ++i) {
         estaciones[i]->fijarPrecios(precioRegular, precioPremium, precioEcoExtra);
@@ -94,7 +147,13 @@ void RedNacional::gestionRedNacional() {
         cout << "4. Fijar precios de combustible\n";
         cout << "0. Volver al menu principal\n";
         cout << "Seleccione una opcion: ";
-        cin >> opcion;
+
+        while (!(cin >> opcion)) {
+            cout << "Error: Ingrese un numero valido.\n";
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "Seleccione una opcion: ";
+        }
 
         switch (opcion) {
         case 1: agregarEstacionServicio(); break;
@@ -141,11 +200,11 @@ EstacionServicio* RedNacional::seleccionarEstacion() const {
 
     int seleccion;
     cout << "Seleccione una estacion (1-" << numEstaciones << "): ";
-    cin >> seleccion;
-
-    if (seleccion < 1 || seleccion > numEstaciones) {
-        cout << "Seleccion invalida.\n";
-        return nullptr;
+    while (!(cin >> seleccion) || seleccion < 1 || seleccion > numEstaciones) {
+        cout << "Error: Seleccion invalida.\n";
+        cin.clear();
+        cin.ignore(10000, '\n');
+        cout << "Seleccione una estacion (1-" << numEstaciones << "): ";
     }
 
     return estaciones[seleccion - 1];
