@@ -1,6 +1,11 @@
-#include "RedNacional.h"
+#include "rednacional.h"
+#include "tanque.h"
+#include "estacionservicio.h"
 #include <iostream>
 #include <cstdlib>
+#include <fstream>
+#include <sstream>
+#include <cctype>
 using namespace std;
 
 RedNacional::RedNacional() : numEstaciones(0) {
@@ -14,7 +19,144 @@ RedNacional::~RedNacional() {
         delete estaciones[i];
     }
 }
+void RedNacional::fijarPrecios(float regular, float premium, float ecoExtra)
+{
+    precioRegular = regular;
+    precioPremium = premium;
+    precioEcoExtra = ecoExtra;
+}
+float RedNacional::obtenerPrecio(const std::string& categoria) const {
+    if (categoria == "Regular") {
+        return precioRegular;
+    } else if (categoria == "Premium") {
+        return precioPremium;
+    } else if (categoria == "EcoExtra") {
+        return precioEcoExtra;
+    }
+    return 0;
 
+}
+void RedNacional::actualizarPreciosPorDia()
+{//editar
+    precioRegular *= 1.01;
+    precioPremium *= 1.01;
+    precioEcoExtra *= 1.01;
+}
+float RedNacional::calcularPrecioConRegion(const string& categoria, const string& region) const
+{
+    float precioBase = 0.0;
+
+    // Determina el precio base según la categoría
+    if (categoria == "Regular")
+    {
+        precioBase = obtenerPrecio("Regular");
+    }
+    else if (categoria == "Premium")
+    {
+        precioBase = obtenerPrecio("Premium");
+    }
+    else if (categoria == "EcoExtra")
+    {
+        precioBase = obtenerPrecio("EcoExtra");
+    }
+    else
+    {
+        std::cerr << "Categoría no válida\n";
+        return 0.0;
+    }
+    // Ajustar el precio según la región
+    if (region == "  norte")
+    {
+        precioBase = precioBase*1.05;
+    }
+    else if (region == "  sur")
+    {
+        precioBase = precioBase*1.02;
+    }
+    return precioBase;
+}
+void RedNacional::cargarDatos() {
+    ifstream archivoEstaciones("estaciones.txt");
+    if (!archivoEstaciones) {
+        cout << "No se pudo abrir el archivo estaciones.txt para cargar.\n";
+        return;
+    }
+
+    string linea;
+    while (getline(archivoEstaciones, linea)) {
+        stringstream ss(linea);
+        string nombre, gerente, region;
+        int codigo;
+        double latitud, longitud;
+
+        getline(ss, nombre, ',');
+        ss >> codigo;
+        ss.ignore();  // Ignorar la coma
+        getline(ss, gerente, ',');
+        getline(ss, region, ',');
+        ss >> latitud;
+        ss.ignore();
+        ss >> longitud;
+
+        EstacionServicio* nuevaEstacion = new EstacionServicio(nombre, codigo, gerente, region, latitud, longitud, this);
+        estaciones[numEstaciones++] = nuevaEstacion;
+
+        // Cargar surtidores de esta estación
+        nuevaEstacion->cargarSurtidores();
+    }
+
+    archivoEstaciones.close();
+    ifstream archivoPrecios("precios.txt");
+    if (!archivoEstaciones) {
+        cout << "No se pudo abrir el archivo estaciones.txt para cargar.\n";
+        return;
+    }
+}
+void RedNacional::guardarDatos()
+{
+    // Guardar estaciones en el archivo "estaciones.txt"
+    ofstream archivoEstaciones("estaciones.txt");
+    if (!archivoEstaciones)
+    {
+        cout << "No se pudo abrir el archivo estaciones.txt para guardar.\n";
+        return;
+    }
+
+    for (int i = 0; i < numEstaciones; ++i) {
+        EstacionServicio* estacion = estaciones[i];
+        archivoEstaciones<< estacion->obtenerNombre() << ", "
+                          << estacion->codigo << ", "
+                          << estacion->gerente << ", "
+                          << estacion->region << ", "
+                          << estacion->latitud << ", "
+                          << estacion->longitud << "\n";
+
+        // Guardar surtidores de cada estación
+        estacion->guardarSurtidores();
+    }
+//8
+    archivoEstaciones.close();
+    ifstream archivoPrecios("precios.txt");
+    if (!archivoPrecios)
+    {
+        cout << "No se pudo abrir el archivo precios.txt.\n";
+        return;
+    }
+    string categoria;
+    float precio;
+    while (archivoPrecios >> categoria >> precio) {
+        if (categoria == "Regular") {
+            precioRegular = precio;
+        } else if (categoria == "Premium") {
+            precioPremium = precio;
+        } else if (categoria == "EcoExtra") {
+            precioEcoExtra = precio;
+        }
+    }
+
+    archivoPrecios.close();
+    cout << "Datos de la red nacional guardados con exito.\n";
+}
 void RedNacional::agregarEstacionServicio() {
     if (numEstaciones < MAX_ESTACIONES) {
         std::string nombre, gerente, region;
@@ -48,11 +190,14 @@ void RedNacional::agregarEstacionServicio() {
         do {
             cout << "Ingrese la region (Norte/Centro/Sur): ";
             cin >> region;
-            if (region != "Norte" && region != "Centro" && region != "Sur") {
+            for (char& c : region)
+        {
+            c =tolower(c);
+        }
+            if (region != "norte" && region != "centro" && region != "sur") {
                 cout << "Error: Region invalida. Ingrese Norte, Centro o Sur.\n";
             }
         } while (region != "Norte" && region != "Centro" && region != "Sur");
-
         cout << "Ingrese la latitud: ";
         while (!(cin >> latitud)) {
             cout << "Error: Ingrese un numero valido para la latitud.\n";
@@ -69,7 +214,7 @@ void RedNacional::agregarEstacionServicio() {
             cout << "Ingrese la longitud: ";
         }
 
-        estaciones[numEstaciones] = new EstacionServicio(nombre, codigo, gerente, region, latitud, longitud);
+        estaciones[numEstaciones] = new EstacionServicio(nombre, codigo, gerente, region, latitud, longitud, this);
         numEstaciones++;
         cout << "Estacion de servicio agregada con exito.\n";
     } else {
@@ -105,7 +250,7 @@ void RedNacional::calcularVentasTotales() const {
 }
 
 void RedNacional::fijarPreciosCombustible() {
-    double precioRegular, precioPremium, precioEcoExtra;
+    float precioRegular, precioPremium, precioEcoExtra;
 
     cout << "Ingrese el nuevo precio para combustible Regular: ";
     while (!(cin >> precioRegular) || precioRegular < 0) {
@@ -124,15 +269,13 @@ void RedNacional::fijarPreciosCombustible() {
     }
 
     cout << "Ingrese el nuevo precio para combustible EcoExtra: ";
+    cin >> precioEcoExtra;
+    //fijarPrecios(precioRegular, precioPremium, precioEcoExtra);
     while (!(cin >> precioEcoExtra) || precioEcoExtra < 0) {
         cout << "Error: Ingrese un precio valido (mayor o igual a 0).\n";
         cin.clear();
         cin.ignore(10000, '\n');
         cout << "Ingrese el nuevo precio para combustible EcoExtra: ";
-    }
-
-    for (int i = 0; i < numEstaciones; ++i) {
-        estaciones[i]->fijarPrecios(precioRegular, precioPremium, precioEcoExtra);
     }
     cout << "Precios actualizados para todas las estaciones.\n";
 }

@@ -1,13 +1,14 @@
-#include "Tanque.h"
+#include "tanque.h"
+#include "estacionservicio.h"
 #include <iostream>
 #include <cstdlib>
 using namespace std;
 
 Tanque::Tanque() : capacidadRegular(0), capacidadPremium(0), capacidadEcoExtra(0),
     cantidadRegular(0), cantidadPremium(0), cantidadEcoExtra(0),
-    precioRegular(0), precioPremium(0), precioEcoExtra(0), totalVendidoRegular(0), 
+     totalVendidoRegular(0),
     totalVendidoPremium(0), totalVendidoEcoExtra(0){}
-
+//precioRegular(0), precioPremium(0), precioEcoExtra(0),
 void Tanque::asignarCapacidades() {
     capacidadRegular = 100 + (rand() % 101); // Entre 100 y 200 litros
     capacidadPremium = 100 + (rand() % 101);
@@ -40,34 +41,26 @@ void Tanque::restarCantidad(const std::string& categoria, double cantidad)
     }
 }
 
-double Tanque::obtenerCantidad(const std::string& categoria) const {
-    if (categoria == "Regular") {
+double Tanque::obtenerCantidad(const string& categoria) const
+{
+
+    if (categoria == "Regular")
+    {
         return cantidadRegular;
-    } else if (categoria == "Premium") {
+    }
+    else if (categoria == "Premium")
+    {
         return cantidadPremium;
-    } else if (categoria == "EcoExtra") {
+    }
+    else if (categoria == "EcoExtra")
+    {
         return cantidadEcoExtra;
     }
     return 0;
 }
 
-double Tanque::obtenerPrecio(const std::string& categoria) const {
-    if (categoria == "Regular") {
-        return precioRegular;
-    } else if (categoria == "Premium") {
-        return precioPremium;
-    } else if (categoria == "EcoExtra") {
-        return precioEcoExtra;
-    }
-    return 0;
-}
 
-void Tanque::fijarPrecios(double regular, double premium, double ecoExtra) 
-{
-    precioRegular = regular;
-    precioPremium = premium;
-    precioEcoExtra = ecoExtra;
-}
+
 
 void Tanque::verificarFugas() const 
 {

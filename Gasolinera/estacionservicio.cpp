@@ -1,26 +1,76 @@
-#include "EstacionServicio.h"
+
+#include "rednacional.h"
 #include <iostream>
 #include <cstdlib>
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 EstacionServicio::EstacionServicio(const string& nombre, int codigo, const string& gerente,
-                                   const string& region, double latitud, double longitud)
+                                   const string& region, double latitud, double longitud, RedNacional* red)
     : nombre(nombre), codigo(codigo), gerente(gerente), region(region),
-    latitud(latitud), longitud(longitud), numSurtidores(0) {
-    for (int i = 0; i < MAX_SURTIDORES; ++i) {
+    latitud(latitud), longitud(longitud), numSurtidores(0), redNacional(red)
+{
+    for (int i = 0; i < MAX_SURTIDORES; ++i)
+    {
         surtidores[i] = nullptr;
     }
     tanque.asignarCapacidades();
 }
 
-EstacionServicio::~EstacionServicio() {
-    for (int i = 0; i < numSurtidores; ++i) {
+EstacionServicio::~EstacionServicio()
+{
+    for (int i = 0; i < numSurtidores; ++i)
+    {
         delete surtidores[i];
     }
 }
+double EstacionServicio::obtenerPrecioCombustible(const string& categoria) const
+{
+    // Llamar a la función de RedNacional para obtener el precio ajustado
+    return redNacional->calcularPrecioConRegion(categoria, region);
+}
+void EstacionServicio::cargarSurtidores()
+{
+    string nombreArchivo = "surtidores_" + to_string(codigo) + ".txt";
+    ifstream archivoSurtidores(nombreArchivo);
+    if (!archivoSurtidores)
+    {
+        cout << "No se pudo abrir el archivo " << nombreArchivo << " para cargar surtidores.\n";
+        return;
+    }
 
-void EstacionServicio::agregarSurtidor() {
-    if (numSurtidores < MAX_SURTIDORES) {
+    string linea;
+    while (getline(archivoSurtidores, linea))
+    {
+        stringstream ss(linea);
+        int codigoSurtidor;
+        string modelo;
+        bool activo;
+
+        ss >> codigoSurtidor;
+        ss.ignore();
+        getline(ss, modelo, ',');
+        ss >> activo;
+
+        Surtidor* nuevoSurtidor = new Surtidor(codigoSurtidor, modelo);
+        if (!activo)
+        {
+            nuevoSurtidor->cambiarEstado();  // Desactivar si estaba inactivo
+        }
+
+        surtidores[numSurtidores++] = nuevoSurtidor;
+
+        // Cargar transacciones de este surtidor
+        nuevoSurtidor->cargarTransacciones();
+    }
+
+    archivoSurtidores.close();
+}
+void EstacionServicio::agregarSurtidor()
+{
+    if (numSurtidores < MAX_SURTIDORES)
+    {
         int codigo;
         string modelo;
 
@@ -48,11 +98,22 @@ void EstacionServicio::agregarSurtidor() {
         surtidores[numSurtidores] = new Surtidor(codigo, modelo);
         numSurtidores++;
         cout << "Surtidor agregado con exito.\n";
-    } else {
+    }
+    else
+    {
         cout << "No se pueden agregar mas surtidores.\n";
     }
 }
-
+void EstacionServicio::guardarSurtidores() const
+{
+    // Crear un archivo para los surtidores de esta estación
+    string nombreArchivo = "surtidores_" + to_string(codigo) + ".txt";
+    ofstream archivoSurtidores(nombreArchivo);
+    if (!archivoSurtidores) {
+        cout << "No se pudo abrir el archivo " << nombreArchivo << " para guardar surtidores.\n";
+        return;
+    }
+}
 void EstacionServicio::eliminarSurtidor() {
     if (numSurtidores == 0) {
         cout << "No hay surtidores para eliminar.\n";
@@ -155,31 +216,26 @@ void EstacionServicio::simularVenta() {
     double cantidadDisponible = tanque.obtenerCantidad(categoriaCombustible);
     double cantidadVendida = (cantidadSolicitada <= cantidadDisponible) ? cantidadSolicitada : cantidadDisponible;
 
-    if (cantidadVendida > 0) {
-        tanque.restarCantidad(categoriaCombustible, cantidadVendida);
-        double precioTotal = cantidadVendida * tanque.obtenerPrecio(categoriaCombustible);
-
-        string metodoPago;
-        switch (rand() % 3) {
-        case 0: metodoPago = "Efectivo"; break;
-        case 1: metodoPago = "TDebito"; break;
-        case 2: metodoPago = "TCredito"; break;
-        }
-
-        int numeroDocumentoCliente = 10000000 + (rand() % 90000000); // Número aleatorio de 8 dígitos
-
-        surtidorSeleccionado->registrarVenta(categoriaCombustible, cantidadVendida, metodoPago, numeroDocumentoCliente, precioTotal);
-
-        cout << "Venta simulada con exito:\n";
-        cout << "Surtidor: " << surtidorSeleccionado->obtenerCodigo() << "\n";
-        cout << "Combustible: " << categoriaCombustible << "\n";
-        cout << "Cantidad: " << cantidadVendida << " litros\n";
-        cout << "Precio total: $" << precioTotal << "\n";
-        cout << "Metodo de pago: " << metodoPago << "\n";
-        cout << "Numero de documento del cliente: " << numeroDocumentoCliente << "\n";
-    } else {
-        cout << "No hay suficiente combustible disponible para realizar la venta.\n";
+    tanque.restarCantidad(categoriaCombustible, cantidadVendida);
+    float precioTotal = cantidadVendida * redNacional->calcularPrecioConRegion(categoriaCombustible, obtenerRegion());
+    string metodoPago;
+    switch (rand() % 3)
+    {
+    case 0: metodoPago = "Efectivo"; break;
+    case 1: metodoPago = "TDebito"; break;
+    case 2: metodoPago = "TCredito"; break;
     }
+
+    int numeroDocumentoCliente = 10000000 + (rand() % 90000000); // Número aleatorio de 8 dígitos
+    surtidorSeleccionado->registrarVenta(categoriaCombustible, cantidadVendida, metodoPago, numeroDocumentoCliente, precioTotal);
+
+    cout << "Venta simulada con exito:\n";
+    cout << "Surtidor: " << surtidorSeleccionado->obtenerCodigo() << "\n";
+    cout << "Combustible: " << categoriaCombustible << "\n";
+    cout << "Cantidad: " << cantidadVendida << " litros\n";
+    cout << "Precio total: $" << precioTotal << "\n";
+    cout << "Metodo de pago: " << metodoPago << "\n";
+    cout << "Numero de documento del cliente: " << numeroDocumentoCliente << "\n";
 }
 
 void EstacionServicio::verificarFugas() const {
@@ -198,11 +254,6 @@ void EstacionServicio::calcularVentasTotales() const {
     cout << "Regular: $" << regularTotal << "\n";
     cout << "Premium: $" << premiumTotal << "\n";
     cout << "EcoExtra: $" << ecoExtraTotal << "\n";
-}
-
-void EstacionServicio::fijarPrecios(double regular, double premium, double ecoExtra) {
-    tanque.fijarPrecios(regular, premium, ecoExtra);
-    cout << "Precios actualizados para la estacion " << nombre << ".\n";
 }
 
 bool EstacionServicio::tieneHurtirsActivos() const {
