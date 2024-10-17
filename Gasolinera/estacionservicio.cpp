@@ -73,10 +73,28 @@ void EstacionServicio::agregarSurtidor()
     {
         int codigo;
         string modelo;
-        cout << "Ingrese el codigo del surtidor: ";
-        cin >> codigo;
+
+        // Validación para el código del surtidor
+        while (true) {
+            cout << "Ingrese el codigo del surtidor: ";
+            cin >> codigo;
+            bool codigoExiste = false;
+            for (int i = 0; i < numSurtidores; ++i) {
+                if (surtidores[i]->obtenerCodigo() == codigo) {
+                    codigoExiste = true;
+                    break;
+                }
+            }
+            if (!codigoExiste) {
+                break;
+            } else {
+                cout << "El codigo ya existe. Por favor, ingrese un codigo diferente.\n";
+            }
+        }
+
         cout << "Ingrese el modelo del surtidor: ";
         cin >> modelo;
+
         surtidores[numSurtidores] = new Surtidor(codigo, modelo);
         numSurtidores++;
         cout << "Surtidor agregado con exito.\n";
@@ -247,6 +265,15 @@ bool EstacionServicio::tieneHurtirsActivos() const {
     return false;
 }
 
+
+// Excepción personalizada
+class EntradaInvalida {
+public:
+    const char* mensaje() const {
+        return "Entrada no válida. Se esperaba un número.";
+    }
+};
+
 void EstacionServicio::gestionarEstacion() {
     int opcion;
     do {
@@ -259,7 +286,17 @@ void EstacionServicio::gestionarEstacion() {
         cout << "6. Simular una venta\n";
         cout << "0. Volver al menu anterior\n";
         cout << "Seleccione una opcion: ";
-        cin >> opcion;
+
+        try {
+            if (!(cin >> opcion)) {  // Si la entrada no es un número
+                throw EntradaInvalida();  // Lanzamos nuestra excepción personalizada
+            }
+        } catch (const EntradaInvalida& e) {
+            cout << e.mensaje() << endl;
+            cin.clear();  // Limpiar el estado de error de cin
+            cin.ignore(10000, '\n');  // Ignorar caracteres inválidos en el buffer
+            continue;  // Volver a solicitar la opción
+        }
 
         switch (opcion) {
         case 1: agregarSurtidor(); break;
