@@ -124,17 +124,16 @@ void RedNacional::guardarDatos()
 
     for (int i = 0; i < numEstaciones; ++i) {
         EstacionServicio* estacion = estaciones[i];
-        archivoEstaciones<< estacion->obtenerNombre() << ", "
-                          << estacion->codigo << ", "
-                          << estacion->gerente << ", "
-                          << estacion->region << ", "
-                          << estacion->latitud << ", "
+        archivoEstaciones<< estacion->obtenerNombre() << ","
+                          << estacion->codigo << ","
+                          << estacion->gerente << ","
+                          << estacion->region << ","
+                          << estacion->latitud << ","
                           << estacion->longitud << "\n";
 
         // Guardar surtidores de cada estación
         estacion->guardarSurtidores();
     }
-//8
     archivoEstaciones.close();
     ifstream archivoPrecios("precios.txt");
     if (!archivoPrecios)
@@ -269,8 +268,6 @@ void RedNacional::fijarPreciosCombustible() {
     }
 
     cout << "Ingrese el nuevo precio para combustible EcoExtra: ";
-    cin >> precioEcoExtra;
-    //fijarPrecios(precioRegular, precioPremium, precioEcoExtra);
     while (!(cin >> precioEcoExtra) || precioEcoExtra < 0) {
         cout << "Error: Ingrese un precio valido (mayor o igual a 0).\n";
         cin.clear();
