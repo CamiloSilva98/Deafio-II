@@ -20,7 +20,7 @@ public:
     // Métodos para gestionar la red de estaciones
     void actualizarPreciosPorDia();
     void gestionarRedNacional();
-
+    void cargarPreciosDesdeArchivo();
     float calcularPrecioConRegion(const std::string& categoria, const std::string& region) const;
     void agregarEstacionServicio();
     void eliminarEstacionServicio();

@@ -73,7 +73,6 @@ void EstacionServicio::agregarSurtidor()
     {
         int codigo;
         string modelo;
-
         // Validación para el código del surtidor
         while (true) {
             cout << "Ingrese el codigo del surtidor: ";
@@ -114,6 +113,7 @@ void EstacionServicio::guardarSurtidores() const
         return;
     }
 }
+
 void EstacionServicio::eliminarSurtidor() {
     if (numSurtidores == 0) {
         cout << "No hay surtidores para eliminar.\n";
@@ -189,7 +189,16 @@ void EstacionServicio::reportarLitrosVendidos() const {
     cout << "Premium: " << premiumTotal << " litros\n";
     cout << "EcoExtra: " << ecoExtraTotal << " litros\n";
 }
-
+string obtenerFechaYHoraActual()
+{
+    time_t tiempoActual = time(0);
+    tm *ltm = localtime(&tiempoActual);
+    char buffer[20];
+    snprintf(buffer, sizeof(buffer), "%02d-%02d-%d %02d:%02d:%02d",
+             ltm->tm_mday, ltm->tm_mon + 1, ltm->tm_year + 1900,
+             ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+    return std::string(buffer);
+}
 void EstacionServicio::simularVenta() {
     if (numSurtidores == 0) {
         cout << "No hay surtidores disponibles para simular una venta.\n";
@@ -203,7 +212,7 @@ void EstacionServicio::simularVenta() {
         cout << "El surtidor seleccionado no esta activo. Intente de nuevo.\n";
         return;
     }
-
+    string F = obtenerFechaYHoraActual();//fecha y hora
     string categoriaCombustible;
     int opcion = rand() % 3;
     switch (opcion) {
@@ -230,6 +239,7 @@ void EstacionServicio::simularVenta() {
     surtidorSeleccionado->registrarVenta(categoriaCombustible, cantidadVendida, metodoPago, numeroDocumentoCliente, precioTotal);
 
     cout << "Venta simulada con exito:\n";
+    cout << F<<'\n';//imprime la fecha y hora del momento en que la trasaccion se empieza a realizar
     cout << "Surtidor: " << surtidorSeleccionado->obtenerCodigo() << "\n";
     cout << "Combustible: " << categoriaCombustible << "\n";
     cout << "Cantidad: " << cantidadVendida << " litros\n";

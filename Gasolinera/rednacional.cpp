@@ -110,11 +110,8 @@ void RedNacional::cargarDatos() {
     }
 
     archivoEstaciones.close();
-    ifstream archivoPrecios("precios.txt");
-    if (!archivoEstaciones) {
-        cout << "No se pudo abrir el archivo estaciones.txt para cargar.\n";
-        return;
-    }
+    cargarPreciosDesdeArchivo();
+    return;
 }
 
 void RedNacional::guardarDatos()
@@ -140,26 +137,45 @@ void RedNacional::guardarDatos()
         estacion->guardarSurtidores();
     }
     archivoEstaciones.close();
-    ifstream archivoPrecios("precios.txt");
+    ofstream archivoPrecios("precios.txt");
     if (!archivoPrecios)
     {
-        cout << "No se pudo abrir el archivo precios.txt.\n";
+        cout << "No se pudo abrir el archivo precios.txt para guardar.\n";
         return;
     }
-    string categoria;
-    float precio;
-    while (archivoPrecios >> categoria >> precio) {
-        if (categoria == "Regular") {
-            precioRegular = precio;
-        } else if (categoria == "Premium") {
-            precioPremium = precio;
-        } else if (categoria == "EcoExtra") {
-            precioEcoExtra = precio;
-        }
-    }
+
+    // Obtener el día actual
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    unsigned int diaActual = ltm->tm_mday;
+
+    // Guardar el día actual y los precios
+    archivoPrecios << diaActual << "\n"; // Guardamos el día actual
+    archivoPrecios << precioRegular << "\n";// Guardamos el precio regular
+    archivoPrecios << precioPremium << "\n";// Guardamos el precio premium
+    archivoPrecios << precioEcoExtra << "\n";// Guardamos el precio EcoExtra
 
     archivoPrecios.close();
     cout << "Datos de la red nacional guardados con exito.\n";
+}
+void RedNacional::cargarPreciosDesdeArchivo() {
+    std::ifstream archivoPrecios("precios.txt");
+    if (!archivoPrecios) {
+        std::cout << "No se pudo abrir el archivo precios.txt. Verifique que el archivo existe.\n";
+        return;
+    }
+    unsigned int day;
+    // Leer los precios en el orden: Regular, Premium, EcoExtra
+    archivoPrecios >>day >> precioRegular >> precioPremium >> precioEcoExtra;
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    unsigned int diaActual = ltm->tm_mday;
+    if (day!=diaActual)
+    {
+        actualizarPreciosPorDia();
+    }
+    archivoPrecios.close();
+    std::cout << "Precios cargados correctamente desde el archivo.\n";
 }
 
 void RedNacional::agregarEstacionServicio() {
