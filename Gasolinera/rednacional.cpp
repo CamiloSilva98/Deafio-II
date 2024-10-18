@@ -19,12 +19,14 @@ RedNacional::~RedNacional() {
         delete estaciones[i];
     }
 }
+
 void RedNacional::fijarPrecios(float regular, float premium, float ecoExtra)
 {
     precioRegular = regular;
     precioPremium = premium;
     precioEcoExtra = ecoExtra;
 }
+
 float RedNacional::obtenerPrecio(const std::string& categoria) const {
     if (categoria == "Regular") {
         return precioRegular;
@@ -34,14 +36,15 @@ float RedNacional::obtenerPrecio(const std::string& categoria) const {
         return precioEcoExtra;
     }
     return 0;
-
 }
+
 void RedNacional::actualizarPreciosPorDia()
 {
     precioRegular *= 1.01;
     precioPremium *= 1.01;
     precioEcoExtra *= 1.01;
 }
+
 float RedNacional::calcularPrecioConRegion(const string& categoria, const string& region) const
 {
     float precioBase = 0.0;
@@ -75,6 +78,7 @@ float RedNacional::calcularPrecioConRegion(const string& categoria, const string
     }
     return precioBase;
 }
+
 void RedNacional::cargarDatos() {
     ifstream archivoEstaciones("estaciones.txt");
     if (!archivoEstaciones) {
@@ -112,6 +116,7 @@ void RedNacional::cargarDatos() {
         return;
     }
 }
+
 void RedNacional::guardarDatos()
 {
     // Guardar estaciones en el archivo "estaciones.txt"
@@ -156,27 +161,55 @@ void RedNacional::guardarDatos()
     archivoPrecios.close();
     cout << "Datos de la red nacional guardados con exito.\n";
 }
+
 void RedNacional::agregarEstacionServicio() {
     if (numEstaciones < MAX_ESTACIONES) {
         std::string nombre, gerente, region;
         int codigo;
         double latitud, longitud;
-
-        cout << "Ingrese el nombre de la estacion: ";
-        while (!(cin >> nombre)) {
-            cout << "Error: Ingrese un nombre valido.\n";
-            cin.clear();
-            cin.ignore(10000, '\n');
+        // Verificar nombre único
+        bool nombreUnico;
+        do {
+            nombreUnico = true;
             cout << "Ingrese el nombre de la estacion: ";
-        }
+            while (!(cin >> nombre)) {
+                cout << "Error: Ingrese un nombre valido.\n";
+                cin.clear();
+                cin.ignore(10000, '\n');
+                cout << "Ingrese el nombre de la estacion: ";
+            }
 
-        cout << "Ingrese el codigo de la estacion: ";
-        while (!(cin >> codigo)) {
-            cout << "Error: Ingrese un codigo numerico valido.\n";
-            cin.clear();
-            cin.ignore(10000, '\n');
+            // Verificar si el nombre ya existe
+            for (int i = 0; i < numEstaciones; ++i) {
+                if (estaciones[i]->obtenerNombre() == nombre) {
+                    nombreUnico = false;
+                    cout << "Error: Ya existe una estacion con ese nombre. Intente de nuevo.\n";
+                    break;
+                }
+            }
+        } while (!nombreUnico);
+
+        // Verificar código único
+        bool codigoUnico;
+        do {
+            codigoUnico = true;
             cout << "Ingrese el codigo de la estacion: ";
-        }
+            while (!(cin >> codigo)) {
+                cout << "Error: Ingrese un codigo numerico valido.\n";
+                cin.clear();
+                cin.ignore(10000, '\n');
+                cout << "Ingrese el codigo de la estacion: ";
+            }
+
+            // Verificar si el código ya existe
+            for (int i = 0; i < numEstaciones; ++i) {
+                if (estaciones[i]->codigo == codigo) {
+                    codigoUnico = false;
+                    cout << "Error: Ya existe una estacion con ese codigo. Intente de nuevo.\n";
+                    break;
+                }
+            }
+        } while (!codigoUnico);
 
         cout << "Ingrese el nombre del gerente: ";
         while (!(cin >> gerente)) {
@@ -190,9 +223,9 @@ void RedNacional::agregarEstacionServicio() {
             cout << "Ingrese la region (Norte/Centro/Sur): ";
             cin >> region;
             for (char& c : region)
-        {
-            c =tolower(c);
-        }
+            {
+                c = tolower(c);
+            }
             if (region != "norte" && region != "centro" && region != "sur") {
                 cout << "Error: Region invalida. Ingrese Norte, Centro o Sur.\n";
             }
@@ -350,4 +383,3 @@ EstacionServicio* RedNacional::seleccionarEstacion() const {
 
     return estaciones[seleccion - 1];
 }
-
