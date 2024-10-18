@@ -64,7 +64,6 @@ float RedNacional::calcularPrecioConRegion(const string& categoria, const string
         std::cerr << "Categoría no válida\n";
         return 0.0;
     }
-    cout<<"|"<<region;
     // Ajustar el precio según la región
     if (region == "norte")
     {
