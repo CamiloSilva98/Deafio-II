@@ -33,7 +33,9 @@ public:
     double obtenerVentaTotal(const string& categoria) const;
     void cambiarEstado();
     bool estaActivo() const;
+    void guardarTransacciones() const;
     int obtenerCodigo() const;
+    void cargarTransacciones();
 };
 
 #endif // SURTIDOR_H

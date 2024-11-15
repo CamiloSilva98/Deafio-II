@@ -1,6 +1,11 @@
-#include "RedNacional.h"
+#include "rednacional.h"
+#include "tanque.h"
+#include "estacionservicio.h"
 #include <iostream>
 #include <cstdlib>
+#include <fstream>
+#include <sstream>
+#include <cctype>
 using namespace std;
 
 RedNacional::RedNacional() : numEstaciones(0) {
@@ -15,27 +20,212 @@ RedNacional::~RedNacional() {
     }
 }
 
+void RedNacional::fijarPrecios(float regular, float premium, float ecoExtra)
+{
+    precioRegular = regular;
+    precioPremium = premium;
+    precioEcoExtra = ecoExtra;
+}
+
+float RedNacional::obtenerPrecio(const std::string& categoria) const {
+    if (categoria == "Regular") {
+        return precioRegular;
+    } else if (categoria == "Premium") {
+        return precioPremium;
+    } else if (categoria == "EcoExtra") {
+        return precioEcoExtra;
+    }
+    return 0;
+}
+
+void RedNacional::actualizarPreciosPorDia()
+{
+    precioRegular *= 1.01;
+    precioPremium *= 1.01;
+    precioEcoExtra *= 1.01;
+}
+
+float RedNacional::calcularPrecioConRegion(const string& categoria, const string& region) const
+{
+    float precioBase = 0.0;
+
+    // Determina el precio base según la categoría
+    if (categoria == "Regular")
+    {
+        precioBase = obtenerPrecio("Regular");
+    }
+    else if (categoria == "Premium")
+    {
+        precioBase = obtenerPrecio("Premium");
+    }
+    else if (categoria == "EcoExtra")
+    {
+        precioBase = obtenerPrecio("EcoExtra");
+    }
+    else
+    {
+        std::cerr << "Categoría no válida\n";
+        return 0.0;
+    }
+    // Ajustar el precio según la región
+    if (region == "norte")
+    {
+        precioBase = precioBase*1.05;
+    }
+    else if (region == "sur")
+    {
+        precioBase = precioBase*1.02;
+    }
+    return precioBase;
+}
+
+void RedNacional::cargarDatos() {
+    ifstream archivoEstaciones("estaciones.txt");
+    if (!archivoEstaciones) {
+        cout << "No se pudo abrir el archivo estaciones.txt para cargar.\n";
+        return;
+    }
+
+    string linea;
+    while (getline(archivoEstaciones, linea)) {
+        stringstream ss(linea);
+        string nombre, gerente, region;
+        int codigo;
+        double latitud, longitud;
+
+        getline(ss, nombre, ',');
+        ss >> codigo;
+        ss.ignore();  // Ignorar la coma
+        getline(ss, gerente, ',');
+        getline(ss, region, ',');
+        ss >> latitud;
+        ss.ignore();
+        ss >> longitud;
+
+        EstacionServicio* nuevaEstacion = new EstacionServicio(nombre, codigo, gerente, region, latitud, longitud, this);
+        estaciones[numEstaciones++] = nuevaEstacion;
+
+        // Cargar surtidores de esta estación
+        nuevaEstacion->cargarSurtidores();
+    }
+
+    archivoEstaciones.close();
+    cargarPreciosDesdeArchivo();
+    return;
+}
+
+void RedNacional::guardarDatos()
+{
+    // Guardar estaciones en el archivo "estaciones.txt"
+    ofstream archivoEstaciones("estaciones.txt");
+    if (!archivoEstaciones)
+    {
+        cout << "No se pudo abrir el archivo estaciones.txt para guardar.\n";
+        return;
+    }
+
+    for (int i = 0; i < numEstaciones; ++i) {
+        EstacionServicio* estacion = estaciones[i];
+        archivoEstaciones<< estacion->obtenerNombre() << ","
+                          << estacion->codigo << ","
+                          << estacion->gerente << ","
+                          << estacion->region << ","
+                          << estacion->latitud << ","
+                          << estacion->longitud << "\n";
+
+        // Guardar surtidores de cada estación
+        estacion->guardarSurtidores();
+    }
+    archivoEstaciones.close();
+    ofstream archivoPrecios("precios.txt");
+    if (!archivoPrecios)
+    {
+        cout << "No se pudo abrir el archivo precios.txt para guardar.\n";
+        return;
+    }
+
+    // Obtener el día actual
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    unsigned int diaActual = ltm->tm_mday;
+
+    // Guardar el día actual y los precios
+    archivoPrecios << diaActual << "\n"; // Guardamos el día actual
+    archivoPrecios << precioRegular << "\n";// Guardamos el precio regular
+    archivoPrecios << precioPremium << "\n";// Guardamos el precio premium
+    archivoPrecios << precioEcoExtra << "\n";// Guardamos el precio EcoExtra
+
+    archivoPrecios.close();
+    cout << "Datos de la red nacional guardados con exito.\n";
+}
+void RedNacional::cargarPreciosDesdeArchivo() {
+    std::ifstream archivoPrecios("precios.txt");
+    if (!archivoPrecios) {
+        std::cout << "No se pudo abrir el archivo precios.txt. Verifique que el archivo existe.\n";
+        return;
+    }
+    unsigned int day;
+    // Leer los precios en el orden: Regular, Premium, EcoExtra
+    archivoPrecios >>day >> precioRegular >> precioPremium >> precioEcoExtra;
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    unsigned int diaActual = ltm->tm_mday;
+    if (day!=diaActual)
+    {
+        actualizarPreciosPorDia();
+    }
+    archivoPrecios.close();
+    std::cout << "Precios cargados correctamente desde el archivo.\n";
+}
+
 void RedNacional::agregarEstacionServicio() {
     if (numEstaciones < MAX_ESTACIONES) {
         std::string nombre, gerente, region;
         int codigo;
         double latitud, longitud;
-
-        cout << "Ingrese el nombre de la estacion: ";
-        while (!(cin >> nombre)) {
-            cout << "Error: Ingrese un nombre valido.\n";
-            cin.clear();
-            cin.ignore(10000, '\n');
+        // Verificar nombre único
+        bool nombreUnico;
+        do {
+            nombreUnico = true;
             cout << "Ingrese el nombre de la estacion: ";
-        }
+            while (!(cin >> nombre)) {
+                cout << "Error: Ingrese un nombre valido.\n";
+                cin.clear();
+                cin.ignore(10000, '\n');
+                cout << "Ingrese el nombre de la estacion: ";
+            }
 
-        cout << "Ingrese el codigo de la estacion: ";
-        while (!(cin >> codigo)) {
-            cout << "Error: Ingrese un codigo numerico valido.\n";
-            cin.clear();
-            cin.ignore(10000, '\n');
+            // Verificar si el nombre ya existe
+            for (int i = 0; i < numEstaciones; ++i) {
+                if (estaciones[i]->obtenerNombre() == nombre) {
+                    nombreUnico = false;
+                    cout << "Error: Ya existe una estacion con ese nombre. Intente de nuevo.\n";
+                    break;
+                }
+            }
+        } while (!nombreUnico);
+
+        // Verificar código único
+        bool codigoUnico;
+        do {
+            codigoUnico = true;
             cout << "Ingrese el codigo de la estacion: ";
-        }
+            while (!(cin >> codigo)) {
+                cout << "Error: Ingrese un codigo numerico valido.\n";
+                cin.clear();
+                cin.ignore(10000, '\n');
+                cout << "Ingrese el codigo de la estacion: ";
+            }
+
+            // Verificar si el código ya existe
+            for (int i = 0; i < numEstaciones; ++i) {
+                if (estaciones[i]->codigo == codigo) {
+                    codigoUnico = false;
+                    cout << "Error: Ya existe una estacion con ese codigo. Intente de nuevo.\n";
+                    break;
+                }
+            }
+        } while (!codigoUnico);
 
         cout << "Ingrese el nombre del gerente: ";
         while (!(cin >> gerente)) {
@@ -48,11 +238,14 @@ void RedNacional::agregarEstacionServicio() {
         do {
             cout << "Ingrese la region (Norte/Centro/Sur): ";
             cin >> region;
-            if (region != "Norte" && region != "Centro" && region != "Sur") {
+            for (char& c : region)
+            {
+                c = tolower(c);
+            }
+            if (region != "norte" && region != "centro" && region != "sur") {
                 cout << "Error: Region invalida. Ingrese Norte, Centro o Sur.\n";
             }
-        } while (region != "Norte" && region != "Centro" && region != "Sur");
-
+        } while (region != "norte" && region != "centro" && region != "sur");
         cout << "Ingrese la latitud: ";
         while (!(cin >> latitud)) {
             cout << "Error: Ingrese un numero valido para la latitud.\n";
@@ -69,7 +262,7 @@ void RedNacional::agregarEstacionServicio() {
             cout << "Ingrese la longitud: ";
         }
 
-        estaciones[numEstaciones] = new EstacionServicio(nombre, codigo, gerente, region, latitud, longitud);
+        estaciones[numEstaciones] = new EstacionServicio(nombre, codigo, gerente, region, latitud, longitud, this);
         numEstaciones++;
         cout << "Estacion de servicio agregada con exito.\n";
     } else {
@@ -105,7 +298,7 @@ void RedNacional::calcularVentasTotales() const {
 }
 
 void RedNacional::fijarPreciosCombustible() {
-    double precioRegular, precioPremium, precioEcoExtra;
+    float precioRegular, precioPremium, precioEcoExtra;
 
     cout << "Ingrese el nuevo precio para combustible Regular: ";
     while (!(cin >> precioRegular) || precioRegular < 0) {
@@ -130,10 +323,7 @@ void RedNacional::fijarPreciosCombustible() {
         cin.ignore(10000, '\n');
         cout << "Ingrese el nuevo precio para combustible EcoExtra: ";
     }
-
-    for (int i = 0; i < numEstaciones; ++i) {
-        estaciones[i]->fijarPrecios(precioRegular, precioPremium, precioEcoExtra);
-    }
+    fijarPrecios(precioRegular, precioPremium, precioEcoExtra);
     cout << "Precios actualizados para todas las estaciones.\n";
 }
 
@@ -209,4 +399,3 @@ EstacionServicio* RedNacional::seleccionarEstacion() const {
 
     return estaciones[seleccion - 1];
 }
-
